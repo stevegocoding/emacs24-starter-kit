@@ -1,0 +1,503 @@
+#+TITLE: Guangfu Shi's Emacs Configuration
+#+OPTIONS: toc:4 h:4
+
+* Configuration
+** About this file
+<<babel-init>>
+
+** Personal information
+
+#+BEGIN_SRC emacs-lisp
+(setq user-full-name "Guangfu Shi"
+      user-mail-address "stevegocoding@gmail.com")
+#+END_SRC
+
+#+RESULTS:
+: stevegocoding@gmail.com
+
+** Emacs initialization
+
+*** Add package sources
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+(unless (assoc-default "melpa" package-archives)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  (package-refresh-contents))
+
+(when (not package-archive-contents)
+  (package-refresh-contents))
+
+(defvar my-packages
+  '(helm
+    helm-descbinds
+    smart-mode-line
+    undo-tree
+    guide-key
+    helm-swoop
+    windmove))
+
+(dolist (p my-packages)
+  (when (not (package-installed-p p))
+    (package-install p)))
+#+END_SRC
+
+#+RESULTS:
+
+*** Add my elisp directory and other files
+
+Sometimes I load files outside the package system. As long as they're
+in a directory in my =load-path=, Emacs can find them.
+
+#+BEGIN_SRC emacs-lisp
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+(setq use-package-verbose t)
+(require 'use-package)
+(use-package auto-compile
+  :ensure t
+  :init (auto-compile-on-load-mode))
+(setq load-prefer-newer t)
+#+END_SRC
+
+#+RESULTS:
+: t
+
+Use =M-x package-refresh-contents= to reload the list of packages
+after adding these for the first time.
+
+
+** General configuration
+
+*** Indent
+#+BEGIN_SRC emacs-lisp
+(bind-keys ("RET" . newline-and-indent)
+           ("C-j" . newline-and-indent))
+#+END_SRC
+
+#+RESULTS:
+: newline-and-indent
+
+*** Backups
+
+This is one of the things people usually want to change right away. By default, Emacs saves backup files in the current directory. These are the files ending in =~= that are cluttering up your directory lists. The following code stashes them all in =~/.emacs.d/backups=, where I can find them with =C-x C-f= (=find-file=) if I really need to.
+
+#+BEGIN_SRC emacs-lisp
+(setq delete-old-versions -1)
+(setq version-control t)
+(setq vc-make-backup-files t)
+(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+#+END_SRC
+
+#+RESULTS:
+| .* | ~/.emacs.d/auto-save-list/ | t |
+
+*** History
+
+From http://www.wisdomandwonder.com/wordpress/wp-content/uploads/2014/03/C3F.html
+#+BEGIN_SRC emacs-lisp
+(setq savehist-file "~/.emacs.d/savehist")
+(savehist-mode 1)
+(setq history-length t)
+(setq history-delete-duplicates t)
+(setq savehist-save-minibuffer-history 1)
+(setq savehist-additional-variables
+      '(kill-ring
+        search-ring
+        regexp-search-ring))
+#+END_SRC
+
+#+RESULTS:
+| kill-ring | search-ring | regexp-search-ring |
+
+*** Windows configuration
+
+#+BEGIN_SRC emacs-lisp
+(when window-system
+  (tooltip-mode -1)
+  (tool-bar-mode -1)
+  (menu-bar-mode 1)
+  (scroll-bar-mode -1))
+#+END_SRC
+
+#+RESULTS:
+
+*** Helm - interactive completion
+
+Helm makes it easy to complete various things. I find it to be easier
+to configure than ido in order to get completion in as many places as
+possible, although I prefer ido's way of switching buffers.
+
+#+BEGIN_SRC emacs-lisp
+(use-package helm
+  :ensure t
+  :diminish helm-mode
+  :init
+  (progn
+    (require 'helm-config)
+    (setq helm-candidate-number-limit 100)
+    ;; From https://gist.github.com/antifuchs/9238468
+    (setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
+          helm-input-idle-delay 0.01  ; this actually updates things
+                                        ; reeeelatively quickly.
+          helm-yas-display-key-on-candidate t
+          helm-quick-update t
+          helm-M-x-requires-pattern nil
+          helm-ff-skip-boring-files t)
+    (helm-mode))
+  :bind (("C-c h" . helm-mini)
+         ("C-h a" . helm-apropos)
+         ("C-x C-b" . helm-buffers-list)
+         ("C-x b" . helm-buffers-list)
+         ("M-y" . helm-show-kill-ring)
+         ("M-x" . helm-M-x)
+         ("C-x c o" . helm-occur)
+         ("C-x c s" . helm-swoop)
+         ("C-x c y" . helm-yas-complete)
+         ("C-x c Y" . helm-yas-create-snippet-on-region)
+         ("C-x c b" . my/helm-do-grep-book-notes)
+         ("C-x c SPC" . helm-all-mark-rings)))
+(ido-mode -1) ;; Turn off ido mode in case I enabled it accidentally
+#+END_SRC
+
+#+RESULTS:
+
+Great for describing bindings. I'll replace the binding for =where-is= too.
+
+#+BEGIN_SRC emacs-lisp
+(use-package helm-descbinds
+  :defer t
+  :bind (("C-h b" . helm-descbinds)
+         ("C-h w" . helm-descbinds)))
+#+END_SRC
+
+#+RESULTS:
+
+*** Mode line format
+
+Display a more compact mode line
+
+#+BEGIN_SRC emacs-lisp
+(use-package smart-mode-line
+  :defer t
+  :init
+  (progn
+  (setq-default
+   mode-line-format
+   '("%e"
+     mode-line-front-space
+     mode-line-mule-info
+     mode-line-client
+     mode-line-modified
+     mode-line-remote
+     mode-line-frame-identification
+     mode-line-buffer-identification
+     "   "
+     mode-line-position
+     (vc-mode vc-mode)
+     "  "
+     mode-line-modes
+     mode-line-misc-info
+     mode-line-end-spaces))))
+#+END_SRC
+
+#+RESULTS:
+| %e | mode-line-front-space | mode-line-mule-info | mode-line-client | mode-line-modified | mode-line-remote | mode-line-frame-identification | mode-line-buffer-identification |   | mode-line-position | (vc-mode vc-mode) |   | mode-line-modes | mode-line-misc-info | mode-line-end-spaces |
+
+*** Change "yes or no" to "y or n"
+
+#+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+#+RESULTS:
+: y-or-n-p
+
+*** UTF-8
+
+From http://www.wisdomandwonder.com/wordpress/wp-content/uploads/2014/03/C3F.html
+#+BEGIN_SRC emacs-lisp
+(prefer-coding-system 'utf-8)
+(when (display-graphic-p)
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+#+END_SRC
+
+#+RESULTS:
+| UTF8_STRING | COMPOUND_TEXT | TEXT | STRING |
+
+*** Killing text
+
+From https://github.com/itsjeyd/emacs-config/blob/emacs24/init.el
+
+#+BEGIN_SRC emacs-lisp
+(defadvice kill-region (before slick-cut activate compile)
+  "When called interactively with no active region, kill a single line instead."
+  (interactive
+    (if mark-active (list (region-beginning) (region-end))
+      (list (line-beginning-position)
+        (line-beginning-position 2)))))
+#+END_SRC
+
+#+RESULTS:
+: kill-region
+
+*** Repeatable commands
+
+Based on http://oremacs.com/2015/01/14/repeatable-commands/ . Modified to
+accept =nil= as the first value if you don't want the keymap to run a
+command by default, and to use =kbd= for the keybinding definitions.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/def-rep-command (alist)
+    "Return a lambda that calls the first function of ALIST.
+It sets the transient map to all functions of ALIST,
+allowing you to repeat those functions as needed."
+    (let ((keymap (make-sparse-keymap))
+                  (func (cdar alist)))
+      (mapc (lambda (x)
+              (when x
+                (define-key keymap (kbd (car x)) (cdr x))))
+            alist)
+      (lambda (arg)
+        (interactive "p")
+        (when func
+          (funcall func arg))
+        (set-transient-map keymap t))))
+#+END_SRC
+
+#+RESULTS:
+: my/def-rep-command
+
+** Navigation
+
+*** Movement
+#+BEGIN_SRC emacs-lisp
+(bind-keys ("C-S-n" . (lambda () (interactive) (ignore-errors (next-line 5))))
+           ("C-S-p" . (lambda () (interactive) (ignore-errors (previous-line 5))))
+           ("C-S-b" . (lambda () (interactive) (ignore-errors (backward-char 5))))
+           ("C-S-f" . (lambda () (interactive) (ignore-errors (forward-char 5)))))
+#+END_SRC
+
+#+RESULTS:
+| lambda | nil | (interactive) | (ignore-errors (forward-char 5)) |
+
+*** Scroll 
+#+BEGIN_SRC emacs-lisp
+
+(setq
+  scroll-margin 0                  
+  scroll-conservatively 100000
+  scroll-preserve-screen-position 1)
+
+#+END_SRC
+
+#+RESULTS:
+: 1
+
+*** Helm-swoop - quickly finding lines
+
+This promises to be a fast way to find things. Let's bind it to =Ctrl-Shift-S= to see if I can get used to that...
+
+#+BEGIN_SRC emacs-lisp
+(use-package helm-swoop
+ :defer t
+ :bind
+ (("C-S-s" . helm-swoop)
+  ("M-i" . helm-swoop)
+  ("M-s s" . helm-swoop)
+  ("M-s M-s" . helm-swoop)
+  ("M-I" . helm-swoop-back-to-last-point)
+  ("C-c M-i" . helm-multi-swoop)
+  ("C-x M-i" . helm-multi-swoop-all)
+  )
+ :config
+ (progn
+   (define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
+   (define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop))
+)
+#+END_SRC
+
+#+RESULTS:
+
+*** Windmove - switching between windows
+
+Windmove lets you move between windows with something more natural than cycling through =C-x o= (=other-window=).
+Windmove doesn't behave well with Org, so we need to use different keybindings.
+
+#+BEGIN_SRC emacs-lisp
+(use-package windmove
+  :defer t
+   )
+(windmove-default-keybindings)
+(add-hook 'org-shiftup-final-hook 'windmove-up)
+(add-hook 'org-shiftleft-final-hook 'windmove-left)
+(add-hook 'org-shiftdown-final-hook 'windmove-down)
+(add-hook 'org-shiftright-final-hook 'windmove-right)
+#+END_SRC
+
+#+RESULTS:
+| windmove-right |
+
+*** Make window splitting more useful
+
+Copied from http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
+
+#+BEGIN_SRC emacs-lisp
+(defun my/vsplit-last-buffer (prefix)
+  "Split the window vertically and display the previous buffer."
+  (interactive "p")
+  (split-window-vertically)
+  (other-window 1 nil)
+  (if (= prefix 1)
+    (switch-to-next-buffer)))
+(defun my/hsplit-last-buffer (prefix)
+  "Split the window horizontally and display the previous buffer."
+  (interactive "p")
+  (split-window-horizontally)
+  (other-window 1 nil)
+  (if (= prefix 1) (switch-to-next-buffer)))
+(bind-key "C-x 2" 'my/vsplit-last-buffer)
+(bind-key "C-x 3" 'my/hsplit-last-buffer)
+#+END_SRC
+
+#+RESULTS:
+: my/hsplit-last-buffer
+
+*** Frequently-accessed files
+Registers allow you to jump to a file or other location quickly. To
+jump to a register, use =C-x r j= followed by the letter of the
+register. Using registers for all these file shortcuts is probably a bit of a waste since I can easily define my own keymap, but since I rarely go beyond register A anyway. Also, I might as well add shortcuts for refiling.
+
+#+BEGIN_SRC emacs-lisp
+(defvar my/refile-map (make-sparse-keymap))
+
+(defmacro my/defshortcut (key file)
+  `(progn
+     (set-register ,key (cons 'file ,file))
+     (define-key my/refile-map
+       (char-to-string ,key)
+       (lambda (prefix)
+         (interactive "p")
+         (let ((org-refile-targets '(((,file) :maxlevel . 6)))
+               (current-prefix-arg (or current-prefix-arg '(4))))
+           (call-interactively 'org-refile))))))
+
+(my/defshortcut ?c "~/.emacs.d/magkbdev.org")
+#+END_SRC
+
+#+RESULTS:
+| lambda | (prefix) | (interactive p) | (let ((org-refile-targets (quote (((~/.emacs.d/magkbdev.org) :maxlevel . 6)))) (current-prefix-arg (or current-prefix-arg (quote (4))))) (call-interactively (quote org-refile))) |
+
+** Coding
+
+*** Tab width of 2 is compact and readable
+#+BEGIN_SRC emacs-lisp
+(setq-default tab-width 2)
+#+END_SRC
+
+#+RESULTS:
+: 2
+
+*** New lines are always indented
+#+begin_src emacs-lisp
+(global-set-key (kbd "RET") 'newline-and-indent)
+#+end_src
+
+#+RESULTS:
+: newline-and-indent
+
+From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
+#+begin_src emacs-lisp
+(defun sanityinc/kill-back-to-indentation ()
+  "Kill from point back to the first non-whitespace character on the line."
+  (interactive)
+  (let ((prev-pos (point)))
+    (back-to-indentation)
+    (kill-region (point) prev-pos)))
+
+(bind-key "C-M-<backspace>" 'sanityinc/kill-back-to-indentation)
+#+end_src
+
+#+RESULTS:
+: sanityinc/kill-back-to-indentation
+
+*** Clojue
+
+**** Clojure Mode
+#+BEGIN_SRC emacs-lisp
+(use-package clojure-mode
+  :ensure t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
+  (add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))
+  (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
+  :config
+  (rename-modeline "clojure-mode" clojure-mode "λ")
+  (use-package align-cljlet
+    :ensure t
+    :bind ("C-! a a" . align-cljlet)))
+#+END_SRC
+
+#+RESULTS:
+: t
+
+**** CIDER
+#+BEGIN_SRC emacs-lisp
+(use-package cider
+  :ensure t
+  :config
+  (setq nrepl-hide-special-buffers t
+        nrepl-popup-stacktraces-in-repl t
+        nrepl-history-file "~/.emacs.d/nrepl-history"
+        cider-mode-line " CIDER"
+        cider-repl-display-in-current-window t
+        cider-auto-select-error-buffer nil
+        cider-repl-pop-to-buffer-on-connect nil
+        cider-show-error-buffer nil)
+  (defun cider-use-repl-tools ()
+    (interactive)
+    (cider-interactive-eval
+     "(use 'clojure.repl)"))
+
+  (bind-keys :map cider-repl-mode-map
+             ("M-r" . cider-refresh)
+             ("M-R" . cider-use-repl-tools))
+
+  ;; this snippet comes from schmir https://github.com/schmir/.emacs.d/blob/master/lisp/setup-clojure.el
+  (defadvice cider-load-buffer (after switch-namespace activate compile)
+    "switch to namespace"
+    (cider-repl-set-ns (cider-current-ns))
+    (cider-switch-to-repl-buffer))
+
+  ;; fix cond indenting
+  (put 'cond 'clojure-backtracking-indent '(2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4)))
+#+END_SRC
+
+#+RESULTS:
+: t
+
+**** Paredit
+#+BEGIN_SRC emacs-lisp
+(use-package paredit
+  :ensure t
+  :diminish paredit-mode
+  :init
+
+  (progn
+    (add-hook 'clojure-mode-hook 'enable-paredit-mode)
+    (add-hook 'cider-repl-mode-hook 'enable-paredit-mode)
+    (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+    (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+    (add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
+    (add-hook 'ielm-mode-hook 'enable-paredit-mode)
+    (add-hook 'json-mode-hook 'enable-paredit-mode))
+  :config
+  (bind-keys
+   :map clojure-mode-map    
+   ("M-[" . paredit-wrap-square)
+   ("M-{" . paredit-wrap-curly)))
+#+END_SRC
+
+#+RESULTS:
+: t
+
