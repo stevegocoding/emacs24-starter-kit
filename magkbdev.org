@@ -56,7 +56,7 @@ in a directory in my =load-path=, Emacs can find them.
 (require 'use-package)
 (use-package auto-compile
   :ensure t
-  :init (auto-compile-on-load-mode))
+  :init )
 (setq load-prefer-newer t)
 #+END_SRC
 
@@ -432,7 +432,6 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
   (add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))
   (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
   :config
-  (rename-modeline "clojure-mode" clojure-mode "λ")
   (use-package align-cljlet
     :ensure t
     :bind ("C-! a a" . align-cljlet)))
