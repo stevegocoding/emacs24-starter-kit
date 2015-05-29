@@ -67,6 +67,178 @@ Use =M-x package-refresh-contents= to reload the list of packages
 after adding these for the first time.
 
 
+** Emacs Utilities
+*** Fullframe
+#+BEGIN_SRC emacs-lisp
+(use-package fullframe
+  :ensure t)
+#+END_SRC
+
+*** Golden Ratio 
+#+BEGIN_SRC emacs-lisp
+(use-package golden-ratio
+  :ensure t
+  :diminish golden-ratio-mode
+  :init
+  (golden-ratio-mode 1)
+  (setq golden-ratio-auto-scale t))
+#+END_SRC
+
+#+RESULTS:
+|
+
+*** Winner Mode
+#+BEGIN_SRC emacs-lisp
+(use-package winner
+  :init (winner-mode))
+#+END_SRC
+
+#+RESULTS:
+
+*** Company Mode
+#+BEGIN_SRC emacs-lisp
+(use-package company
+  :ensure t
+  :diminish company-mode
+  :bind ("C-." . company-complete)
+  :init
+  (global-company-mode 1)
+  :config
+  (bind-keys :map company-active-map
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous)
+             ("C-d" . company-show-doc-buffer)
+             ("<tab>" . company-complete)))
+#+END_SRC
+
+*** Ace Jump Mode
+#+BEGIN_SRC emacs-lisp
+(use-package ace-jump-mode
+  :ensure t
+  :bind (("M-SPC" . ace-jump-char-mode)
+         ("M-2" . ace-window))
+  :init
+  (use-package ace-jump-buffer
+    :ensure t)
+  (use-package ace-link
+    :ensure t
+    :init
+    (ace-link-setup-default))
+  (use-package ace-jump-zap
+    :ensure t)
+  (use-package ace-window
+    :ensure t
+    :bind ("C-x o" . ace-window)
+    :init
+    (setq aw-background nil)
+    (setq aw-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
+  (bind-keys :prefix-map ace-jump-map
+             :prefix "C-c j"
+             ("c" . ace-jump-char-mode)
+             ("l" . ace-jump-line-mode)
+             ("w" . ace-jump-word-mode)
+             ("W" . ace-window)
+             ("b" . ace-jump-buffer)
+             ("o" . ace-jump-buffer-other-window)
+             ("p" . ace-jump-projectile-buffers)
+             ("z" . ace-jump-zap-to-char)
+             ("Z" . ace-jump-zap-up-to-char)))
+
+(bind-key "C-x SPC" 'cycle-spacing)
+#+END_SRC
+
+*** Key Chord Mode
+#+BEGIN_SRC emacs-lisp
+(use-package key-chord
+  :ensure t
+  :init
+  (progn 
+    (setq key-chord-two-keys-delay .015
+          key-chord-one-key-delay .020)
+    (key-chord-mode 0)
+    (key-chord-define-global "cg" 'undo)
+    (key-chord-define-global "yp" 'other-window)
+    (key-chord-define-global ";0" 'delete-window)
+    (key-chord-define-global ";1" 'delete-other-windows)
+    (key-chord-define-global ";2" 'split-window-below)
+    (key-chord-define-global ";3"  'split-window-right)
+    (key-chord-define-global ",." 'beginning-of-buffer)
+    (key-chord-define-global ".p" 'end-of-buffer)
+    (key-chord-define-global "jw" 'ace-jump-word-mode)
+    (key-chord-define-global "jc" 'ace-jump-char-mode)
+    (key-chord-define-global "jl" 'ace-jump-line-mode)
+    (key-chord-define-global "jb" 'ace-jump-buffer)
+    (key-chord-define-global "jo" 'ace-jump-buffer-other-window)
+    (key-chord-define-global "'l" 'ido-switch-buffer)
+    (key-chord-define-global "'-" 'smex)
+    (key-chord-define-global ",r" 'find-file)
+    (key-chord-define-global ".c" 'ido-dired)
+    (key-chord-define-global "0r" ")")
+    (key-chord-define-global "1'" "!")
+    (key-chord-define-global "2," "@")
+    (key-chord-define-global "3." "#")
+    (key-chord-define-global "4p" "$")
+    (key-chord-define-global "5y" "%")
+    (key-chord-define-global "6y" "^")
+    (key-chord-define-global "7f" "&")
+    (key-chord-define-global "8g" "*")
+    (key-chord-define-global "9c" "(")
+    (key-chord-define-global "-l" "_")
+    (key-chord-define emacs-lisp-mode-map "7f" "&optional ")))
+#+END_SRC
+
+#+RESULTS:
+
+*** Smart Scan
+Search what is under the cursor
+#+BEGIN_SRC emacs-lisp
+(use-package smartscan
+  :ensure t
+  :init
+  (global-smartscan-mode t)
+
+  (defun highlight-symbol-first ()
+    "Jump to the first location of symbol at point."
+    (interactive)
+    (push-mark)
+    (eval
+     `(progn
+        (goto-char (point-min))
+        (search-forward-regexp
+         (rx symbol-start ,(thing-at-point 'symbol) symbol-end)
+         nil t)
+        (beginning-of-thing 'symbol))))
+
+  (defun highlight-symbol-last ()
+    "Jump to the last location of symbol at point."
+    (interactive)
+    (push-mark)
+    (eval
+     `(progn
+        (goto-char (point-max))
+        (search-backward-regexp
+         (rx symbol-start ,(thing-at-point 'symbol) symbol-end)
+         nil t))))
+
+  (bind-keys ("M-P" . highlight-symbol-first)
+             ("M-N" . highlight-symbol-last)))
+#+END_SRC
+
+#+RESULTS:
+
+*** Kill Ring
+#+BEGIN_SRC emacs-lisp
+(use-package browse-kill-ring
+  :ensure t
+  :bind ("C-x C-y" . browse-kill-ring)
+  :config
+  (setq browse-kill-ring-quit-action 'kill-and-delete-window))
+
+(setq save-interprogram-paste-before-kill t)
+#+END_SRC
+
+
+
 ** General configuration
 
 *** Indent
@@ -428,6 +600,8 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
   :defer t
   :bind ("C-=" . er/expand-region))
 #+END_SRC
+
+#+RESULTS:
 
 
 
