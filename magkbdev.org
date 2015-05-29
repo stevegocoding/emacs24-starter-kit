@@ -421,6 +421,16 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 #+RESULTS:
 : sanityinc/kill-back-to-indentation
 
+*** Expand Region
+#+BEGIN_SRC emacs-lisp
+(use-package expand-region
+  :ensure t
+  :defer t
+  :bind ("C-=" . er/expand-region))
+#+END_SRC
+
+
+
 *** Clojue
 
 **** Clojure Mode
