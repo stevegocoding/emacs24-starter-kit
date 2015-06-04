@@ -17,6 +17,8 @@
 
 ** Emacs initialization
 
+(add-to-list 'exec-path "/usr/local/bin")
+
 *** Add package sources
 
 #+BEGIN_SRC emacs-lisp
@@ -74,13 +76,15 @@ after adding these for the first time.
   :ensure t)
 #+END_SRC
 
+#+RESULTS:
+
 *** Golden Ratio 
 #+BEGIN_SRC emacs-lisp
 (use-package golden-ratio
   :ensure t
   :diminish golden-ratio-mode
   :init
-  (golden-ratio-mode 1)
+  (golden-ratio-mode -1)
   (setq golden-ratio-auto-scale t))
 #+END_SRC
 
@@ -110,6 +114,8 @@ after adding these for the first time.
              ("C-d" . company-show-doc-buffer)
              ("<tab>" . company-complete)))
 #+END_SRC
+
+#+RESULTS:
 
 *** Ace Jump Mode
 #+BEGIN_SRC emacs-lisp
@@ -146,6 +152,9 @@ after adding these for the first time.
 
 (bind-key "C-x SPC" 'cycle-spacing)
 #+END_SRC
+
+#+RESULTS:
+: cycle-spacing
 
 *** Key Chord Mode
 #+BEGIN_SRC emacs-lisp
@@ -189,43 +198,6 @@ after adding these for the first time.
 
 #+RESULTS:
 
-*** Smart Scan
-Search what is under the cursor
-#+BEGIN_SRC emacs-lisp
-(use-package smartscan
-  :ensure t
-  :init
-  (global-smartscan-mode t)
-
-  (defun highlight-symbol-first ()
-    "Jump to the first location of symbol at point."
-    (interactive)
-    (push-mark)
-    (eval
-     `(progn
-        (goto-char (point-min))
-        (search-forward-regexp
-         (rx symbol-start ,(thing-at-point 'symbol) symbol-end)
-         nil t)
-        (beginning-of-thing 'symbol))))
-
-  (defun highlight-symbol-last ()
-    "Jump to the last location of symbol at point."
-    (interactive)
-    (push-mark)
-    (eval
-     `(progn
-        (goto-char (point-max))
-        (search-backward-regexp
-         (rx symbol-start ,(thing-at-point 'symbol) symbol-end)
-         nil t))))
-
-  (bind-keys ("M-P" . highlight-symbol-first)
-             ("M-N" . highlight-symbol-last)))
-#+END_SRC
-
-#+RESULTS:
-
 *** Kill Ring
 #+BEGIN_SRC emacs-lisp
 (use-package browse-kill-ring
@@ -236,6 +208,9 @@ Search what is under the cursor
 
 (setq save-interprogram-paste-before-kill t)
 #+END_SRC
+
+#+RESULTS:
+: t
 
 
 
@@ -562,6 +537,15 @@ register. Using registers for all these file shortcuts is probably a bit of a wa
 
 ** Coding
 
+*** Global keybinding
+#+BEGIN_SRC emacs-lisp
+(global-set-key [f7] 'paredit-mode)
+(global-set-key [f9] 'cider-jack-in)
+#+END_SRC
+
+#+RESULTS:
+: cider-jack-in
+
 *** Tab width of 2 is compact and readable
 #+BEGIN_SRC emacs-lisp
 (setq-default tab-width 2)
@@ -643,8 +627,8 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
      "(use 'clojure.repl)"))
 
   (bind-keys :map cider-repl-mode-map
-             ("M-r" . cider-refresh)
-             ("M-R" . cider-use-repl-tools))
+             ("M-s-r" . cider-refresh)
+             ("M-s-o" . cider-use-repl-tools))
 
   ;; this snippet comes from schmir https://github.com/schmir/.emacs.d/blob/master/lisp/setup-clojure.el
   (defadvice cider-load-buffer (after switch-namespace activate compile)
@@ -663,7 +647,6 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 #+BEGIN_SRC emacs-lisp
 (use-package paredit
   :ensure t
-  :diminish paredit-mode
   :init
 
   (progn
@@ -683,4 +666,36 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 
 #+RESULTS:
 : t
+
+**** Magit
+
+
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :load-path "~/.emacs.d/site-lisp/magit"
+  :bind (("C-x g" . magit-status)
+         ("C-c g" . magit-status))
+  :init
+  (use-package git-timemachine
+    :ensure t
+    :bind (("C-x v t" . git-timemachine)))
+  (use-package git-link
+    :ensure t
+    :bind (("C-x v L" . git-link))
+    :init
+    (setq git-link-open-in-browser t))
+  :config
+  (setq magit-use-overlays nil)
+  (diminish 'magit-auto-revert-mode)
+  (diminish 'magit-backup-mode)
+  (fullframe magit-status magit-mode-quit-window nil)
+
+  (bind-keys :map magit-status-mode-map
+             ("TAB" . magit-section-toggle)
+             ("<C-tab>" . magit-section-cycle))
+  (bind-keys :map magit-branch-section-map
+             ("RET" . magit-checkout)))
+#+END_SRC
+
+#+RESULTS:
 
