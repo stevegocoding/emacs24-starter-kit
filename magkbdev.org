@@ -2,8 +2,10 @@
 #+OPTIONS: toc:4 h:4
 
 * Configuration
+
 ** About this file
 <<babel-init>>
+
 
 ** Personal information
 
@@ -14,6 +16,7 @@
 
 #+RESULTS:
 : stevegocoding@gmail.com
+
 
 ** Emacs initialization
 
@@ -458,6 +461,7 @@ allowing you to repeat those functions as needed."
 #+RESULTS:
 : t
 
+
 ** Navigation
 
 *** Movement
@@ -577,6 +581,7 @@ register. Using registers for all these file shortcuts is probably a bit of a wa
 
 #+RESULTS:
 | lambda | (prefix) | (interactive p) | (let ((org-refile-targets (quote (((~/.emacs.d/magkbdev.org) :maxlevel . 6)))) (current-prefix-arg (or current-prefix-arg (quote (4))))) (call-interactively (quote org-refile))) |
+
 
 ** Coding
 
@@ -741,4 +746,13 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 #+END_SRC
 
 #+RESULTS:
-     
+
+**** 4clojure mode
+
+#+BEGIN_SRC emacs-lisp
+(use-package 4clojure
+  :ensure t)
+#+END_SRC
+
+#+RESULTS:
+
