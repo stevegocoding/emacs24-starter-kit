@@ -452,15 +452,15 @@ allowing you to repeat those functions as needed."
 
 *** Theme
 #+BEGIN_SRC emacs-lisp
-(use-package planet-theme
+(use-package leuven-theme
 :ensure t
 :config
-;; (load-theme 'planet t))
+(load-theme 'leuven t))
 #+END_SRC
 
 #+RESULTS:
 : t
-
+    
 
 ** Navigation
 
