@@ -25,26 +25,28 @@
 *** Add package sources
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-(unless (assoc-default "melpa" package-archives)
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-  (package-refresh-contents))
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+  (unless (assoc-default "melpa" package-archives)
+    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+    (add-to-list 'package-archives '("elpy" . "http://jorgenschaefer.github.io/packages/"))
+    (package-refresh-contents))
 
-(when (not package-archive-contents)
-  (package-refresh-contents))
+  (when (not package-archive-contents)
+    (package-refresh-contents))
 
-(defvar my-packages
-  '(helm
-    helm-descbinds
-    smart-mode-line
-    undo-tree
-    guide-key
-    helm-swoop
-    windmove))
+  (defvar my-packages
+    '(helm
+      helm-descbinds
+      smart-mode-line
+      undo-tree
+      guide-key
+      helm-swoop
+      windmove
+      emacs-color-themes))
 
-(dolist (p my-packages)
-  (when (not (package-installed-p p))
-    (package-install p)))
+  (dolist (p my-packages)
+    (when (not (package-installed-p p))
+      (package-install p)))
 #+END_SRC
 
 #+RESULTS:
@@ -269,6 +271,8 @@ From http://www.wisdomandwonder.com/wordpress/wp-content/uploads/2014/03/C3F.htm
   (tool-bar-mode -1)
   (menu-bar-mode 1)
   (scroll-bar-mode -1))
+
+(setq ring-bell-function (lambda () (message "*beep*")))
 #+END_SRC
 
 #+RESULTS:
@@ -450,7 +454,8 @@ allowing you to repeat those functions as needed."
 #+RESULTS:
 | lambda | (prefix) | (interactive p) | (let ((org-refile-targets (quote (((~/develop/projects/notes/oracle_1z0-061_prep.org) :maxlevel . 6)))) (current-prefix-arg (or current-prefix-arg (quote (4))))) (call-interactively (quote org-refile))) |
 
-*** Theme
+**
+* Theme
 #+BEGIN_SRC emacs-lisp
 (use-package leuven-theme
 :ensure t
@@ -655,7 +660,7 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 
 #+RESULTS:
 : t
-
+     
 **** CIDER
 #+BEGIN_SRC emacs-lisp
 (use-package cider
@@ -755,4 +760,21 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 #+END_SRC
 
 #+RESULTS:
+
+
+*** Python
+**** elpy
+#+BEGIN_SRC emacs-lisp
+  (use-package elpy
+    :ensure t
+    :config
+    (remove-hook 'elpy-modules 'elpy-module-flymake)
+    (remove-hook 'elpy-modules 'elpy-module-yasnippet)
+    (elpy-enable))
+
+  (use-package jedi)
+#+END_SRC
+
+#+RESULTS:
+
 
