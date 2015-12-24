@@ -10,8 +10,8 @@
 ** Personal information
 
 #+BEGIN_SRC emacs-lisp
-(setq user-full-name "Guangfu Shi"
-      user-mail-address "stevegocoding@gmail.com")
+  (setq user-full-name "Guangfu Shi"
+        user-mail-address "stevegocoding@gmail.com")
 #+END_SRC
 
 #+RESULTS:
@@ -35,14 +35,14 @@
     (package-refresh-contents))
 
   (defvar my-packages
-    '(helm
+    '(rainbow-delimiters
+      helm
       helm-descbinds
       smart-mode-line
       undo-tree
       guide-key
       helm-swoop
-      windmove
-      emacs-color-themes))
+      windmove))
 
   (dolist (p my-packages)
     (when (not (package-installed-p p))
@@ -276,6 +276,7 @@ From http://www.wisdomandwonder.com/wordpress/wp-content/uploads/2014/03/C3F.htm
 #+END_SRC
 
 #+RESULTS:
+| lambda | nil | (message *beep*) |
 
 *** Helm - interactive completion
 
@@ -643,7 +644,6 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 
 
 *** Clojue
-
 **** Clojure Mode
 #+BEGIN_SRC emacs-lisp
 (use-package clojure-mode
@@ -660,7 +660,17 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 
 #+RESULTS:
 : t
-     
+**** Rainbow Delimiters
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :config
+    (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode))
+#+END_SRC
+
+#+RESULTS:
+: t
+
 **** CIDER
 #+BEGIN_SRC emacs-lisp
 (use-package cider
