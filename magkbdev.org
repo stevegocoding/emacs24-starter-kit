@@ -42,7 +42,9 @@
       undo-tree
       guide-key
       helm-swoop
-      windmove))
+      windmove
+      ag
+      exec-path-from-shell))
 
   (dolist (p my-packages)
     (when (not (package-installed-p p))
@@ -75,6 +77,13 @@ after adding these for the first time.
 
 
 ** Emacs Utilities
+
+*** Exec Path
+#+BEGIN_SRC emacs-lisp
+  (when (memq window-system '(mac ns))
+    (exec-path-from-shell-initialize))
+#+END_SRC
+
 *** Fullframe
 #+BEGIN_SRC emacs-lisp
 (use-package fullframe
@@ -220,6 +229,11 @@ after adding these for the first time.
 
 
 ** General configuration
+
+*** AG
+#+BEGIN_SRC emacs-lisp
+  (setq ag-highlight-search t)
+#+END_SRC
 
 
 *** Indent
@@ -633,10 +647,11 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 
 *** Expand Region
 #+BEGIN_SRC emacs-lisp
-(use-package expand-region
-  :ensure t
-  :defer t
-  :bind ("C-=" . er/expand-region))
+  (use-package expand-region
+    :ensure t
+    :defer t
+    :bind (("C-|" . er/contract-region)
+           ("C-=" . er/expand-region)))
 #+END_SRC
 
 #+RESULTS:
