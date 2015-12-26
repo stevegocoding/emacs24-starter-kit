@@ -329,10 +329,15 @@ possible, although I prefer ido's way of switching buffers.
               (use-package helm-projectile
                 :bind (("C-x f" . helm-projectile)
                        ("C-c p f" . helm-projectile-find-file)
-                       ("C-c p s" . helm-projectile-switch-project))))
+                       ("C-c p s" . helm-projectile-switch-project)))
+              
+              (use-package helm-ag
+                :bind ("C-M-s" . helm-ag-this-file)))
               
       
     :bind (("C-c h" . helm-mini)
+           ("M-g >" . helm-ag-this-file)
+           ("M-O" . helm-ag-pop-stack)
            ("C-h a" . helm-apropos)
            ("C-x C-b" . helm-buffers-list)
            ("C-x b" . helm-buffers-list)
