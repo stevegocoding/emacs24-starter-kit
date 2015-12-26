@@ -329,7 +329,8 @@ possible, although I prefer ido's way of switching buffers.
               (use-package helm-projectile
                 :bind (("C-x f" . helm-projectile)
                        ("C-c p f" . helm-projectile-find-file)
-                       ("C-c p s" . helm-projectile-switch-project)))
+                       ("C-c p s" . helm-projectile-switch-project)
+                       ("M-F" . helm-projectile-ag)))
               
               (use-package helm-ag
                 :bind ("C-M-s" . helm-ag-this-file)))
@@ -671,6 +672,8 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 *** Projectile
 #+BEGIN_SRC emacs-lisp
   (use-package 'projectile
+    (projectile-global-mode)
+    (setq projectile-mode-line "foo")
     :ensure t)
 #+END_SRC
 
