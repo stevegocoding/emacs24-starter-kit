@@ -337,7 +337,6 @@ possible, although I prefer ido's way of switching buffers.
               
       
     :bind (("C-c h" . helm-mini)
-           ("M-g >" . helm-ag-this-file)
            ("M-O" . helm-ag-pop-stack)
            ("C-h a" . helm-apropos)
            ("C-x C-b" . helm-buffers-list)
