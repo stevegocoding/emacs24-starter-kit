@@ -49,7 +49,8 @@
       windmove
       ag
       exec-path-from-shell
-      clj-refactor))
+      clj-refactor
+      bookmark+))
 
   (dolist (p my-packages)
     (when (not (package-installed-p p))
@@ -230,6 +231,15 @@ after adding these for the first time.
 
 #+RESULTS:
 : t
+
+*** Bookmarks
+#+BEGIN_SRC emacs-lisp
+  (use-package bookmark+
+    :ensure t
+    :config
+    (setq bookmark-save-flag 1)
+    )
+#+END_SRC
 
 
 
@@ -799,33 +809,38 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 : t
 
 **** Magit
-
-
 #+BEGIN_SRC emacs-lisp
-(use-package magit
-  :load-path "~/.emacs.d/site-lisp/magit"
-  :bind (("C-x g" . magit-status)
-         ("C-c g" . magit-status))
-  :init
-  (use-package git-timemachine
-    :ensure t
-    :bind (("C-x v t" . git-timemachine)))
-  (use-package git-link
-    :ensure t
-    :bind (("C-x v L" . git-link))
+  (use-package magit
+    :load-path "~/.emacs.d/site-lisp/magit"
+    :bind (("C-x g" . magit-status))
     :init
-    (setq git-link-open-in-browser t))
-  :config
-  (setq magit-use-overlays nil)
-  (diminish 'magit-auto-revert-mode)
-  (diminish 'magit-backup-mode)
-  (fullframe magit-status magit-mode-quit-window nil)
-
-  (bind-keys :map magit-status-mode-map
-             ("TAB" . magit-section-toggle)
-             ("<C-tab>" . magit-section-cycle))
-  (bind-keys :map magit-branch-section-map
-             ("RET" . magit-checkout)))
+    (use-package git-timemachine
+      :ensure t
+      :bind (("C-x v t" . git-timemachine)))
+    (use-package git-link
+      :ensure t
+      :bind (("C-x v L" . git-link))
+      :init
+      (setq git-link-open-in-browser t))
+    :config
+    (defun magit-visit-item-other-window ()
+      "Visit current item in other window."
+      (interactive)
+      (magit-visit-item 1)
+      (other-window -1))
+    (setq magit-use-overlays nil)
+    (diminish 'magit-auto-revert-mode)
+    (diminish 'magit-backup-mode)
+    (fullframe magit-status magit-mode-quit-window nil)
+    (add-hook 'magit-mode-hook
+              (lambda ()
+                (define-key magit-mode-map (kbd "o") 'magit-visit-item-other-window)))
+   
+    (bind-keys :map magit-status-mode-map
+               ("TAB" . magit-section-toggle)
+               ("<C-tab>" . magit-section-cycle))
+    (bind-keys :map magit-branch-section-map
+               ("RET" . magit-checkout)))
 #+END_SRC
 
 #+RESULTS:
