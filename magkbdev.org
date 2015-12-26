@@ -21,6 +21,8 @@
 ** Emacs initialization
 
 (add-to-list 'exec-path "/usr/local/bin")
+(setq debug-on-error t)
+(setq debug-on-quit t)
 
 *** Add package sources
 
@@ -38,6 +40,8 @@
     '(rainbow-delimiters
       helm
       helm-descbinds
+      helm-projectile
+      projectile
       smart-mode-line
       undo-tree
       guide-key
@@ -300,49 +304,50 @@ to configure than ido in order to get completion in as many places as
 possible, although I prefer ido's way of switching buffers.
 
 #+BEGIN_SRC emacs-lisp
-(use-package helm
-  :ensure t
-  :diminish helm-mode
-  :init
-  (progn
-    (require 'helm-config)
-    (setq helm-candidate-number-limit 100)
-    ;; From https://gist.github.com/antifuchs/9238468
-    (setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
-          helm-input-idle-delay 0.01  ; this actually updates things
-                                        ; reeeelatively quickly.
-          helm-yas-display-key-on-candidate t
-          helm-quick-update t
-          helm-M-x-requires-pattern nil
-          helm-ff-skip-boring-files t)
-    (helm-mode))
-  :bind (("C-c h" . helm-mini)
-         ("C-h a" . helm-apropos)
-         ("C-x C-b" . helm-buffers-list)
-         ("C-x b" . helm-buffers-list)
-         ("M-y" . helm-show-kill-ring)
-         ("M-x" . helm-M-x)
-         ("C-x c o" . helm-occur)
-         ("C-x c s" . helm-swoop)
-         ("C-x c y" . helm-yas-complete)
-         ("C-x c Y" . helm-yas-create-snippet-on-region)
-         ("C-x c b" . my/helm-do-grep-book-notes)
-         ("C-x c SPC" . helm-all-mark-rings)))
-(ido-mode -1) ;; Turn off ido mode in case I enabled it accidentally
+  (use-package helm
+    :ensure t
+    :diminish helm-mode
+    :init (progn
+            (helm-mode 1))
+
+    :config (progn
+              (require 'helm-config)
+              (setq helm-candidate-number-limit 100)
+              ;; From https://gist.github.com/antifuchs/9238468
+              (setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
+                    helm-input-idle-delay 0.01  ; this actually updates things
+                                          ; reeeelatively quickly.
+                    helm-yas-display-key-on-candidate t
+                    helm-quick-update t
+                    helm-M-x-requires-pattern nil
+                    helm-ff-skip-boring-files t)
+
+              (use-package helm-descbinds
+                :bind (("C-h b" . helm-descbinds)
+                       ("C-h w" . helm-descbinds)))
+
+              (use-package helm-projectile
+                :bind (("C-x f" . helm-projectile)
+                       ("C-c p f" . helm-projectile-find-file)
+                       ("C-c p s" . helm-projectile-switch-project))))
+              
+      
+    :bind (("C-c h" . helm-mini)
+           ("C-h a" . helm-apropos)
+           ("C-x C-b" . helm-buffers-list)
+           ("C-x b" . helm-buffers-list)
+           ("M-y" . helm-show-kill-ring)
+           ("M-x" . helm-M-x)
+           ("C-x c o" . helm-occur)
+           ("C-x c s" . helm-swoop)
+           ("C-x c y" . helm-yas-complete)
+           ("C-x c Y" . helm-yas-create-snippet-on-region)
+           ("C-x c b" . my/helm-do-grep-book-notes)
+           ("C-x c SPC" . helm-all-mark-rings)))
+
+  (ido-mode -1) ;; Turn off ido mode in case I enabled it accidentally
 #+END_SRC
 
-#+RESULTS:
-
-Great for describing bindings. I'll replace the binding for =where-is= too.
-
-#+BEGIN_SRC emacs-lisp
-(use-package helm-descbinds
-  :defer t
-  :bind (("C-h b" . helm-descbinds)
-         ("C-h w" . helm-descbinds)))
-#+END_SRC
-
-#+RESULTS:
 
 *** Mode line format
 
@@ -660,7 +665,7 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 
 *** Projectile
 #+BEGIN_SRC emacs-lisp
-  (use-package projectile
+  (use-package 'projectile
     :ensure t)
 #+END_SRC
 
@@ -688,13 +693,14 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
     :ensure t
     :init
     ;; Add custom magic requires.
-    (dolist (mapping '(("maps" . "outpace.util.maps")
-                       ("seqs" . "outpace.util.seqs")
-                       ("times" . "outpace.util.times")
-                       ("repl" . "outpace.util.repl")
-                       ("time" . "clj-time.core")
-                       ("string" . "clojure.string")))
-      (add-to-list 'cljr-magic-require-namespaces mapping t))
+    
+    ;; (dolist (mapping '(("maps" . "outpace.util.maps")
+    ;;                    ("seqs" . "outpace.util.seqs")
+    ;;                    ("times" . "outpace.util.times")
+    ;;                    ("repl" . "outpace.util.repl")
+    ;;                    ("time" . "clj-time.core")
+    ;;                    ("string" . "clojure.string")))
+    ;;   (add-to-list 'cljr-magic-require-namespaces mapping t))
 
     (setq cljr-favor-prefix-notation nil)
     (add-hook 'clojure-mode-hook (lambda ()
@@ -816,6 +822,15 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 #+END_SRC
 
 #+RESULTS:
+
+**** Projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :ensure t
+    :init
+    (projectile-global-mode)
+    (setq projectile-completion-system 'helm)
+#+END_SRC
 
 **** 4clojure mode
 
