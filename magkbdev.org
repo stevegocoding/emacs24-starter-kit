@@ -44,7 +44,8 @@
       helm-swoop
       windmove
       ag
-      exec-path-from-shell))
+      exec-path-from-shell
+      clj-refactor))
 
   (dolist (p my-packages)
     (when (not (package-installed-p p))
@@ -348,27 +349,28 @@ Great for describing bindings. I'll replace the binding for =where-is= too.
 Display a more compact mode line
 
 #+BEGIN_SRC emacs-lisp
-(use-package smart-mode-line
-  :defer t
-  :init
-  (progn
-  (setq-default
-   mode-line-format
-   '("%e"
-     mode-line-front-space
-     mode-line-mule-info
-     mode-line-client
-     mode-line-modified
-     mode-line-remote
-     mode-line-frame-identification
-     mode-line-buffer-identification
-     "   "
-     mode-line-position
-     (vc-mode vc-mode)
-     "  "
-     mode-line-modes
-     mode-line-misc-info
-     mode-line-end-spaces))))
+  (use-package smart-mode-line
+    :defer t
+    :init
+    (progn
+    (setq-default
+     mode-line-format
+     '("%e"
+       mode-line-front-space
+       mode-line-mule-info
+       mode-line-client
+       mode-line-modified
+       mode-line-remote
+       mode-line-frame-identification
+       mode-line-buffer-identification
+       "   "
+       mode-line-position
+       (vc-mode vc-mode)
+       "  "
+       mode-line-modes
+       mode-line-misc-info
+       mode-line-end-spaces))))
+
 #+END_SRC
 
 #+RESULTS:
@@ -656,25 +658,56 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 
 #+RESULTS:
 
-
+*** Projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :ensure t)
+#+END_SRC
 
 *** Clojue
 **** Clojure Mode
 #+BEGIN_SRC emacs-lisp
-(use-package clojure-mode
-  :ensure t
-  :init
-  (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
-  (add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))
-  (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
-  :config
-  (use-package align-cljlet
+  (use-package clojure-mode
     :ensure t
-    :bind ("C-! a a" . align-cljlet)))
+    :init
+    (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
+    :config
+    (use-package align-cljlet
+      :ensure t
+      :bind ("C-! a a" . align-cljlet)))
 #+END_SRC
 
 #+RESULTS:
 : t
+
+**** clj-refactor
+#+BEGIN_SRC emacs-lisp
+  (use-package clj-refactor
+    :ensure t
+    :init
+    ;; Add custom magic requires.
+    (dolist (mapping '(("maps" . "outpace.util.maps")
+                       ("seqs" . "outpace.util.seqs")
+                       ("times" . "outpace.util.times")
+                       ("repl" . "outpace.util.repl")
+                       ("time" . "clj-time.core")
+                       ("string" . "clojure.string")))
+      (add-to-list 'cljr-magic-require-namespaces mapping t))
+
+    (setq cljr-favor-prefix-notation nil)
+    (add-hook 'clojure-mode-hook (lambda ()
+                                   (clj-refactor-mode 1)
+                                   (yas/minor-mode 1)
+                                   (cljr-add-keybindings-with-prefix "C-c C-x"))))
+#+END_SRC
+
+#+RESULTS:
+
+
+
+
 **** Rainbow Delimiters
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
@@ -688,34 +721,41 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 
 **** CIDER
 #+BEGIN_SRC emacs-lisp
-(use-package cider
-  :ensure t
-  :config
-  (setq nrepl-hide-special-buffers t
-        nrepl-popup-stacktraces-in-repl t
-        nrepl-history-file "~/.emacs.d/nrepl-history"
-        cider-mode-line " CIDER"
-        cider-repl-display-in-current-window t
-        cider-auto-select-error-buffer nil
-        cider-repl-pop-to-buffer-on-connect nil
-        cider-show-error-buffer nil)
-  (defun cider-use-repl-tools ()
-    (interactive)
-    (cider-interactive-eval
-     "(use 'clojure.repl)"))
+  (use-package cider
+    :ensure t
+    :config
+    (setq nrepl-hide-special-buffers t
+          nrepl-popup-stacktraces-in-repl t
+          nrepl-history-file "~/.emacs.d/nrepl-history"
+          cider-mode-line " CIDER"
+          cider-repl-display-in-current-window t
+          cider-auto-select-error-buffer nil
+          cider-repl-pop-to-buffer-on-connect nil
+          cider-show-error-buffer nil)
+    (defun cider-use-repl-tools ()
+      (interactive)
+      (cider-interactive-eval
+       "(use 'clojure.repl)"))
 
-  (bind-keys :map cider-repl-mode-map
-             ("M-s-r" . cider-refresh)
-             ("M-s-o" . cider-use-repl-tools))
+    (bind-keys :map cider-repl-mode-map
+               ("M-s-r" . cider-refresh)
+               ("M-s-o" . cider-use-repl-tools))
 
-  ;; this snippet comes from schmir https://github.com/schmir/.emacs.d/blob/master/lisp/setup-clojure.el
-  (defadvice cider-load-buffer (after switch-namespace activate compile)
-    "switch to namespace"
-    (cider-repl-set-ns (cider-current-ns))
-    (cider-switch-to-repl-buffer))
+    ;; this snippet comes from schmir https://github.com/schmir/.emacs.d/blob/master/lisp/setup-clojure.el
+    (defadvice cider-load-buffer (after switch-namespace activate compile)
+      "switch to namespace"
+      (cider-repl-set-ns (cider-current-ns))
+      (cider-switch-to-repl-buffer))
 
-  ;; fix cond indenting
-  (put 'cond 'clojure-backtracking-indent '(2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4)))
+    ;; fix cond indenting
+    (put 'cond 'clojure-backtracking-indent '(2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4 2 4))
+    ;; Enable eldoc - shows fn argument list in echo area
+    (add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
+    ;; Use paredit in *nrepl* buffer
+    (add-hook 'nrepl-mode-hook 'paredit-mode)
+
+    ;; Make C-c C-z switch to *nrepl*
+    (add-to-list 'same-window-buffer-names "*nrepl*"))
 #+END_SRC
 
 #+RESULTS:
