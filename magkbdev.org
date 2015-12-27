@@ -139,38 +139,36 @@ after adding these for the first time.
 
 *** Ace Jump Mode
 #+BEGIN_SRC emacs-lisp
-(use-package ace-jump-mode
-  :ensure t
-  :bind (("M-SPC" . ace-jump-char-mode)
-         ("M-2" . ace-window))
-  :init
-  (use-package ace-jump-buffer
-    :ensure t)
-  (use-package ace-link
+  (use-package ace-jump-mode
     :ensure t
+    :bind (("M-SPC" . ace-jump-char-mode))
     :init
-    (ace-link-setup-default))
-  (use-package ace-jump-zap
-    :ensure t)
-  (use-package ace-window
-    :ensure t
-    :bind ("C-x o" . ace-window)
-    :init
-    (setq aw-background nil)
-    (setq aw-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s)))
-  (bind-keys :prefix-map ace-jump-map
-             :prefix "C-c j"
-             ("c" . ace-jump-char-mode)
-             ("l" . ace-jump-line-mode)
-             ("w" . ace-jump-word-mode)
-             ("W" . ace-window)
-             ("b" . ace-jump-buffer)
-             ("o" . ace-jump-buffer-other-window)
-             ("p" . ace-jump-projectile-buffers)
-             ("z" . ace-jump-zap-to-char)
-             ("Z" . ace-jump-zap-up-to-char)))
+    (use-package ace-jump-buffer
+      :ensure t)
+    (use-package ace-link
+      :ensure t
+      :init
+      (ace-link-setup-default))
+    (use-package ace-jump-zap
+      :ensure t)
+    (use-package ace-window
+      :ensure t
+      :bind ("C-x o" . ace-window)
+      :init
+      (setq aw-background nil)
+      (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+    (bind-keys :prefix-map ace-jump-map
+               :prefix "C-c j"
+               ("c" . ace-jump-char-mode)
+               ("l" . ace-jump-line-mode)
+               ("w" . ace-jump-word-mode)
+               ("b" . ace-jump-buffer)
+               ("o" . ace-jump-buffer-other-window)
+               ("p" . ace-jump-projectile-buffers)
+               ("z" . ace-jump-zap-to-char)
+               ("Z" . ace-jump-zap-up-to-char)))
 
-(bind-key "C-x SPC" 'cycle-spacing)
+  (bind-key "C-x SPC" 'cycle-spacing)
 #+END_SRC
 
 #+RESULTS:
@@ -240,6 +238,31 @@ after adding these for the first time.
     (setq bookmark-save-flag 1)
     )
 #+END_SRC
+
+*** Neotree
+#+BEGIN_SRC emacs-lisp
+  (use-package neotree
+    :ensure t
+    :config
+    (setq neo-theme 'ascii)
+    (custom-set-faces
+     '(neo-banner-face ((t . (:inherit shadow))) t)
+     '(neo-header-face ((t . (:inherit shadow))) t)
+     '(neo-root-dir-face ((t . (:inherit link-visited :underline nil))) t)
+     '(neo-dir-link-face ((t . (:inherit dired-directory))) t)
+     '(neo-file-link-face ((t . (:inherit default))) t)
+     '(neo-button-face ((t . (:inherit dired-directory))) t)
+     '(neo-expand-btn-face ((t . (:inherit button))) t))
+    (defun jj-neotree-find ()
+      (interactive)
+      (catch 'return
+        (setq npath (buffer-file-name))
+        (if (null npath)
+            (neotree-toggle)
+          (neotree-find npath))))
+    )
+#+END_SRC
+
 
 
 
@@ -497,7 +520,7 @@ allowing you to repeat those functions as needed."
 (use-package leuven-theme
 :ensure t
 :config
-(load-theme 'leuven t))
+(load-theme 'faff t))
 #+END_SRC
 
 #+RESULTS:
@@ -535,22 +558,19 @@ allowing you to repeat those functions as needed."
 This promises to be a fast way to find things. Let's bind it to =Ctrl-Shift-S= to see if I can get used to that...
 
 #+BEGIN_SRC emacs-lisp
-(use-package helm-swoop
- :defer t
- :bind
- (("C-S-s" . helm-swoop)
-  ("M-i" . helm-swoop)
-  ("M-s s" . helm-swoop)
-  ("M-s M-s" . helm-swoop)
-  ("M-I" . helm-swoop-back-to-last-point)
-  ("C-c M-i" . helm-multi-swoop)
-  ("C-x M-i" . helm-multi-swoop-all)
+  (use-package helm-swoop
+   :defer t
+   :bind
+   (("C-S" . helm-swoop)
+    ("M-I" . helm-swoop-back-to-last-point)
+    ("C-c M-i" . helm-multi-swoop)
+    ("C-x M-i" . helm-multi-swoop-all)
+    )
+   :config
+   (progn
+     (define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
+     (define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop))
   )
- :config
- (progn
-   (define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
-   (define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop))
-)
 #+END_SRC
 
 #+RESULTS:
@@ -682,7 +702,7 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 #+BEGIN_SRC emacs-lisp
   (use-package 'projectile
     (projectile-global-mode)
-    (setq projectile-mode-line "foo")
+    (setq projectile-require-project-root nil)
     :ensure t)
 #+END_SRC
 
