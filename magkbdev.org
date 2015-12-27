@@ -561,7 +561,7 @@ This promises to be a fast way to find things. Let's bind it to =Ctrl-Shift-S= t
   (use-package helm-swoop
    :defer t
    :bind
-   (("C-S" . helm-swoop)
+   (("C-S-s" . helm-swoop)
     ("M-I" . helm-swoop-back-to-last-point)
     ("C-c M-i" . helm-multi-swoop)
     ("C-x M-i" . helm-multi-swoop-all)
@@ -715,6 +715,7 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
     (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
     (add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))
     (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
+    :bind ("<C-return>" . eir-eval-in-cider)
     :config
     (use-package align-cljlet
       :ensure t
@@ -747,9 +748,6 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 #+END_SRC
 
 #+RESULTS:
-
-
-
 
 **** Rainbow Delimiters
 #+BEGIN_SRC emacs-lisp
@@ -804,12 +802,20 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 #+RESULTS:
 : t
 
+**** eval-in-repl
+#+BEGIN_SRC emacs-lisp
+  (use-package eval-in-repl
+    :ensure t
+    :config (progn
+              (use-package eval-in-repl-cider
+                :ensure t)))
+#+END_SRC
+
 **** Paredit
 #+BEGIN_SRC emacs-lisp
 (use-package paredit
   :ensure t
   :init
-
   (progn
     (add-hook 'clojure-mode-hook 'enable-paredit-mode)
     (add-hook 'cider-repl-mode-hook 'enable-paredit-mode)
