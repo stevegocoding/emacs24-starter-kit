@@ -41,6 +41,7 @@
       helm
       helm-descbinds
       helm-projectile
+      helm-ag
       projectile
       smart-mode-line
       undo-tree
@@ -50,7 +51,9 @@
       ag
       exec-path-from-shell
       clj-refactor
-      bookmark+))
+      bookmark+
+      neotree
+      highlight-current-line))
 
   (dolist (p my-packages)
     (when (not (package-installed-p p))
@@ -97,6 +100,15 @@ after adding these for the first time.
 #+END_SRC
 
 #+RESULTS:
+
+*** Highlight current line
+#+BEGIN_SRC emacs-lisp
+  (use-package highlight-current-line
+    :config
+    (set-face-background 'highlight-current-line-face "light grey")
+    (highlight-current-line-whole-line-on nil)
+    (highlight-current-line-on t))
+#+END_SRC
 
 *** Golden Ratio 
 #+BEGIN_SRC emacs-lisp
@@ -338,22 +350,36 @@ possible, although I prefer ido's way of switching buffers.
 
 #+BEGIN_SRC emacs-lisp
   (use-package helm
-    :ensure t
-    :diminish helm-mode
+    :diminish ""
+    :bind (("C-c h" . helm-mini)
+           ("M-O" . helm-ag-pop-stack)
+           ("C-h a" . helm-apropos)
+           ("C-x C-b" . helm-buffers-list)
+           ("C-x b" . helm-buffers-list)
+           ("M-y" . helm-show-kill-ring)
+           ("M-x" . helm-M-x)
+           ("C-/" . helm-occur)
+           ("C-x c s" . helm-swoop)
+           ("C-x c y" . helm-yas-complete)
+           ("C-x c Y" . helm-yas-create-snippet-on-region)
+           ("C-x c b" . my/helm-do-grep-book-notes)
+           ("C-x c SPC" . helm-all-mark-rings))
+
     :init (progn
+            (ido-mode 0)
             (helm-mode 1))
 
     :config (progn
-              (require 'helm-config)
-              (setq helm-candidate-number-limit 100)
-              ;; From https://gist.github.com/antifuchs/9238468
-              (setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
-                    helm-input-idle-delay 0.01  ; this actually updates things
-                                          ; reeeelatively quickly.
-                    helm-yas-display-key-on-candidate t
-                    helm-quick-update t
-                    helm-M-x-requires-pattern nil
-                    helm-ff-skip-boring-files t)
+              (use-package helm-config
+                ;; From https://gist.github.com/antifuchs/9238468
+                ;; (setq helm-candidate-number-limit 100
+                ;;       helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
+                ;;       helm-input-idle-delay 0.01 ; this actually updates things
+                ;;       helm-yas-display-key-on-candidate t
+                ;;       helm-quick-update t
+                ;;       helm-M-x-requires-pattern nil
+                ;;       helm-ff-skip-boring-files t)
+                )
 
               (use-package helm-descbinds
                 :bind (("C-h b" . helm-descbinds)
@@ -366,24 +392,8 @@ possible, although I prefer ido's way of switching buffers.
                        ("M-F" . helm-projectile-ag)))
               
               (use-package helm-ag
-                :bind ("C-M-s" . helm-ag-this-file)))
-              
-      
-    :bind (("C-c h" . helm-mini)
-           ("M-O" . helm-ag-pop-stack)
-           ("C-h a" . helm-apropos)
-           ("C-x C-b" . helm-buffers-list)
-           ("C-x b" . helm-buffers-list)
-           ("M-y" . helm-show-kill-ring)
-           ("M-x" . helm-M-x)
-           ("C-x c o" . helm-occur)
-           ("C-x c s" . helm-swoop)
-           ("C-x c y" . helm-yas-complete)
-           ("C-x c Y" . helm-yas-create-snippet-on-region)
-           ("C-x c b" . my/helm-do-grep-book-notes)
-           ("C-x c SPC" . helm-all-mark-rings)))
-
-  (ido-mode -1) ;; Turn off ido mode in case I enabled it accidentally
+                :bind ("C-M-s" . helm-ag)))
+    ) 
 #+END_SRC
 
 
