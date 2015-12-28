@@ -277,14 +277,12 @@ after adding these for the first time.
 
 
 
-
 ** General configuration
 
 *** AG
 #+BEGIN_SRC emacs-lisp
   (setq ag-highlight-search t)
 #+END_SRC
-
 
 *** Indent
 #+BEGIN_SRC emacs-lisp
@@ -358,7 +356,7 @@ possible, although I prefer ido's way of switching buffers.
            ("C-x b" . helm-buffers-list)
            ("M-y" . helm-show-kill-ring)
            ("M-x" . helm-M-x)
-           ("C-/" . helm-occur)
+           ("M-/" . helm-occur)
            ("C-x c s" . helm-swoop)
            ("C-x c y" . helm-yas-complete)
            ("C-x c Y" . helm-yas-create-snippet-on-region)
@@ -395,7 +393,6 @@ possible, although I prefer ido's way of switching buffers.
                 :bind ("C-M-s" . helm-ag)))
     ) 
 #+END_SRC
-
 
 *** Mode line format
 
@@ -525,12 +522,14 @@ allowing you to repeat those functions as needed."
 | lambda | (prefix) | (interactive p) | (let ((org-refile-targets (quote (((~/develop/projects/notes/oracle_1z0-061_prep.org) :maxlevel . 6)))) (current-prefix-arg (or current-prefix-arg (quote (4))))) (call-interactively (quote org-refile))) |
 
 **
-* Theme
+
+*** Theme
 #+BEGIN_SRC emacs-lisp
-(use-package leuven-theme
-:ensure t
-:config
-(load-theme 'faff t))
+  (use-package faff-theme
+    :ensure t
+    :config
+    (load-theme 'faff t)
+    (set-face-attribute 'region nil :background "#777"))
 #+END_SRC
 
 #+RESULTS:
@@ -538,7 +537,6 @@ allowing you to repeat those functions as needed."
     
 
 ** Navigation
-
 *** Movement
 #+BEGIN_SRC emacs-lisp
 (bind-keys ("C-S-n" . (lambda () (interactive) (ignore-errors (next-line 5))))
@@ -656,7 +654,6 @@ register. Using registers for all these file shortcuts is probably a bit of a wa
 
 
 ** Coding
-
 *** Global keybinding
 #+BEGIN_SRC emacs-lisp
 (global-set-key [f7] 'paredit-mode)
@@ -675,15 +672,12 @@ register. Using registers for all these file shortcuts is probably a bit of a wa
 : 2
 
 *** New lines are always indented
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "RET") 'newline-and-indent)
-#+end_src
-
-#+RESULTS:
-: newline-and-indent
+#+END_SRC
 
 From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (defun sanityinc/kill-back-to-indentation ()
   "Kill from point back to the first non-whitespace character on the line."
   (interactive)
@@ -692,10 +686,7 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
     (kill-region (point) prev-pos)))
 
 (bind-key "C-M-<backspace>" 'sanityinc/kill-back-to-indentation)
-#+end_src
-
-#+RESULTS:
-: sanityinc/kill-back-to-indentation
+#+END_SRC
 
 *** Expand Region
 #+BEGIN_SRC emacs-lisp
@@ -706,59 +697,16 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
            ("C-=" . er/expand-region)))
 #+END_SRC
 
-#+RESULTS:
-
 *** Projectile
 #+BEGIN_SRC emacs-lisp
-  (use-package 'projectile
+  (use-package projectile
+    :ensure t
+    :config
     (projectile-global-mode)
-    (setq projectile-require-project-root nil)
-    :ensure t)
+    (setq projectile-require-project-root nil))
 #+END_SRC
 
 *** Clojue
-**** Clojure Mode
-#+BEGIN_SRC emacs-lisp
-  (use-package clojure-mode
-    :ensure t
-    :init
-    (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
-    (add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))
-    (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
-    :bind ("<C-return>" . eir-eval-in-cider)
-    :config
-    (use-package align-cljlet
-      :ensure t
-      :bind ("C-! a a" . align-cljlet)))
-#+END_SRC
-
-#+RESULTS:
-: t
-
-**** clj-refactor
-#+BEGIN_SRC emacs-lisp
-  (use-package clj-refactor
-    :ensure t
-    :init
-    ;; Add custom magic requires.
-    
-    ;; (dolist (mapping '(("maps" . "outpace.util.maps")
-    ;;                    ("seqs" . "outpace.util.seqs")
-    ;;                    ("times" . "outpace.util.times")
-    ;;                    ("repl" . "outpace.util.repl")
-    ;;                    ("time" . "clj-time.core")
-    ;;                    ("string" . "clojure.string")))
-    ;;   (add-to-list 'cljr-magic-require-namespaces mapping t))
-
-    (setq cljr-favor-prefix-notation nil)
-    (add-hook 'clojure-mode-hook (lambda ()
-                                   (clj-refactor-mode 1)
-                                   (yas/minor-mode 1)
-                                   (cljr-add-keybindings-with-prefix "C-c C-x"))))
-#+END_SRC
-
-#+RESULTS:
-
 **** Rainbow Delimiters
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
@@ -766,9 +714,6 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
     :config
     (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode))
 #+END_SRC
-
-#+RESULTS:
-: t
 
 **** CIDER
 #+BEGIN_SRC emacs-lisp
@@ -778,15 +723,28 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
     (setq nrepl-hide-special-buffers t
           nrepl-popup-stacktraces-in-repl t
           nrepl-history-file "~/.emacs.d/nrepl-history"
-          cider-mode-line " CIDER"
-          cider-repl-display-in-current-window t
           cider-auto-select-error-buffer nil
           cider-repl-pop-to-buffer-on-connect nil
-          cider-show-error-buffer nil)
+          cider-show-error-buffer nil
+          cider-repl-result-prefix ";; => ")
+    
     (defun cider-use-repl-tools ()
       (interactive)
       (cider-interactive-eval
        "(use 'clojure.repl)"))
+
+
+    (defun eval-in-nrepl ()
+      (interactive)
+      (let ((exp (nrepl-last-expression)))
+        (with-current-buffer (nrepl-current-repl-buffer)
+          (nrepl-replace-input exp)
+          (nrepl-return))))
+
+    (eval-after-load 'nrepl
+      '(define-key nrepl-interaction-mode-map
+         (kbd "C-x C-.")
+         'eval-in-nrepl))
 
     (bind-keys :map cider-repl-mode-map
                ("M-s-r" . cider-refresh)
@@ -809,16 +767,61 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
     (add-to-list 'same-window-buffer-names "*nrepl*"))
 #+END_SRC
 
-#+RESULTS:
-: t
-
 **** eval-in-repl
 #+BEGIN_SRC emacs-lisp
   (use-package eval-in-repl
     :ensure t
-    :config (progn
-              (use-package eval-in-repl-cider
-                :ensure t)))
+    :config
+    (setq eir-jump-after-eval nil)
+    (use-package eval-in-repl-cider))
+#+END_SRC
+
+**** Clojure Mode
+#+BEGIN_SRC emacs-lisp
+    (use-package clojure-mode
+      :ensure t
+      :init
+      (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
+      (add-to-list 'auto-mode-alist '("\\.cljx\\'" . clojure-mode))
+      (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
+
+      :config
+      (use-package align-cljlet
+        :ensure t
+        :bind ("C-! a a" . align-cljlet))
+
+      (add-hook 'clojure-mode-hook (lambda ()
+                                     "keymappings"
+                                     (define-key clojure-mode-map (kbd "<C-return>") 'eir-eval-in-cider)))
+
+      )
+#+END_SRC
+
+**** clj-refactor
+#+BEGIN_SRC emacs-lisp
+  (use-package clj-refactor
+    :ensure t
+    :init
+    ;; Add custom magic requires.
+    
+    ;; (dolist (mapping '(("maps" . "outpace.util.maps")
+    ;;                    ("seqs" . "outpace.util.seqs")
+    ;;                    ("times" . "outpace.util.times")
+    ;;                    ("repl" . "outpace.util.repl")
+    ;;                    ("time" . "clj-time.core")
+    ;;                    ("string" . "clojure.string")))
+    ;;   (add-to-list 'cljr-magic-require-namespaces mapping t))
+
+    (setq cljr-favor-prefix-notation nil)
+
+    :config
+    (defun my-clojure-mode-hook ()
+      (clj-refactor-mode 1)
+      (yas-minor-mode 1) ; for adding require/use/import statements
+      ;; This choice of keybinding leaves cider-macroexpand-1 unbound
+      (cljr-add-keybindings-with-prefix "C-c C-m"))
+
+    (add-hook 'clojure-mode-hook #'my-clojure-mode-hook))
 #+END_SRC
 
 **** Paredit
@@ -840,9 +843,6 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
    ("M-[" . paredit-wrap-square)
    ("M-{" . paredit-wrap-curly)))
 #+END_SRC
-
-#+RESULTS:
-: t
 
 **** Magit
 #+BEGIN_SRC emacs-lisp
@@ -879,8 +879,6 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
                ("RET" . magit-checkout)))
 #+END_SRC
 
-#+RESULTS:
-
 **** Projectile
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
@@ -896,10 +894,7 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 (use-package 4clojure
   :ensure t)
 #+END_SRC
-
-#+RESULTS:
-
-
+     
 *** Python
 **** elpy
 #+BEGIN_SRC emacs-lisp
@@ -912,7 +907,4 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 
   (use-package jedi)
 #+END_SRC
-
-#+RESULTS:
-
-
+     
