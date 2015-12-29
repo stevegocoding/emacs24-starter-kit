@@ -530,6 +530,9 @@ allowing you to repeat those functions as needed."
     :config
     (load-theme 'ample-flat t))
   ;; ((set-face-attribute 'region nil :background "#777"))
+
+(set-face-background 'vertical-border "gray")
+(set-face-foreground 'vertical-border (face-background 'vertical-border))
 #+END_SRC
 
 ** Navigation
