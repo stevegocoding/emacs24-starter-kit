@@ -37,23 +37,41 @@
     (package-refresh-contents))
 
   (defvar my-packages
-    '(rainbow-delimiters
+    '(
+      ;; Utilities
       helm
       helm-descbinds
       helm-projectile
       helm-ag
-      projectile
+      helm-swoop
       smart-mode-line
       undo-tree
-      guide-key
-      helm-swoop
       windmove
       ag
       exec-path-from-shell
-      clj-refactor
       bookmark+
       neotree
-      highlight-current-line))
+      highlight-current-line
+      golden-ratio
+      winner
+      company
+      browse-kill-ring
+      
+      ;; Theme
+      ample-theme
+      
+      ;; Development
+      projectile
+      rainbow-delimiters
+      cider
+      clojure-mode
+      clj-refactor
+      eval-in-repl
+      paredit
+      magit
+      elpy
+      4clojure
+      ))
 
   (dolist (p my-packages)
     (when (not (package-installed-p p))
@@ -185,48 +203,6 @@ after adding these for the first time.
 
 #+RESULTS:
 : cycle-spacing
-
-*** Key Chord Mode
-#+BEGIN_SRC emacs-lisp
-(use-package key-chord
-  :ensure t
-  :init
-  (progn 
-    (setq key-chord-two-keys-delay .015
-          key-chord-one-key-delay .020)
-    (key-chord-mode 0)
-    (key-chord-define-global "cg" 'undo)
-    (key-chord-define-global "yp" 'other-window)
-    (key-chord-define-global ";0" 'delete-window)
-    (key-chord-define-global ";1" 'delete-other-windows)
-    (key-chord-define-global ";2" 'split-window-below)
-    (key-chord-define-global ";3"  'split-window-right)
-    (key-chord-define-global ",." 'beginning-of-buffer)
-    (key-chord-define-global ".p" 'end-of-buffer)
-    (key-chord-define-global "jw" 'ace-jump-word-mode)
-    (key-chord-define-global "jc" 'ace-jump-char-mode)
-    (key-chord-define-global "jl" 'ace-jump-line-mode)
-    (key-chord-define-global "jb" 'ace-jump-buffer)
-    (key-chord-define-global "jo" 'ace-jump-buffer-other-window)
-    (key-chord-define-global "'l" 'ido-switch-buffer)
-    (key-chord-define-global "'-" 'smex)
-    (key-chord-define-global ",r" 'find-file)
-    (key-chord-define-global ".c" 'ido-dired)
-    (key-chord-define-global "0r" ")")
-    (key-chord-define-global "1'" "!")
-    (key-chord-define-global "2," "@")
-    (key-chord-define-global "3." "#")
-    (key-chord-define-global "4p" "$")
-    (key-chord-define-global "5y" "%")
-    (key-chord-define-global "6y" "^")
-    (key-chord-define-global "7f" "&")
-    (key-chord-define-global "8g" "*")
-    (key-chord-define-global "9c" "(")
-    (key-chord-define-global "-l" "_")
-    (key-chord-define emacs-lisp-mode-map "7f" "&optional ")))
-#+END_SRC
-
-#+RESULTS:
 
 *** Kill Ring
 #+BEGIN_SRC emacs-lisp
@@ -397,29 +373,41 @@ possible, although I prefer ido's way of switching buffers.
 *** Mode line format
 
 Display a more compact mode line
-
 #+BEGIN_SRC emacs-lisp
   (use-package smart-mode-line
-    :defer t
     :init
+    (add-hook 'after-init-hook 'sml/setup)
+    :config
     (progn
-    (setq-default
-     mode-line-format
-     '("%e"
-       mode-line-front-space
-       mode-line-mule-info
-       mode-line-client
-       mode-line-modified
-       mode-line-remote
-       mode-line-frame-identification
-       mode-line-buffer-identification
-       "   "
-       mode-line-position
-       (vc-mode vc-mode)
-       "  "
-       mode-line-modes
-       mode-line-misc-info
-       mode-line-end-spaces))))
+      (setq sml/no-confirm-load-theme t)
+      
+      (sml/apply-theme 'dark)
+      (setq sml/name-width 20)
+      (setq sml/mode-width 'full)
+      (setq sml/shorten-directory t)
+      (setq sml/shorten-modes t)
+      
+      ;; Display time
+      (setq display-time-24hr-format t)
+      (display-time-mode 1)
+
+      ;; Format
+      (setq-default mode-line-format
+                    '("%e"
+                      mode-line-front-space
+                      mode-line-mule-info
+                      mode-line-client
+                      mode-line-modified
+                      mode-line-remote
+                      mode-line-frame-identification
+                      mode-line-buffer-identification
+                      "   "
+                      mode-line-position
+                      (vc-mode vc-mode)
+                      "  "
+                      mode-line-modes
+                      mode-line-misc-info
+                      mode-line-end-spaces))))
 
 #+END_SRC
 
@@ -525,14 +513,17 @@ allowing you to repeat those functions as needed."
 
 *** Theme
 #+BEGIN_SRC emacs-lisp
-  (use-package ample-theme
-    :ensure t
-    :config
-    (load-theme 'ample-flat t))
-  ;; ((set-face-attribute 'region nil :background "#777"))
+    (use-package ample-theme
+      :ensure t
+      :config
+      (load-theme 'ample-flat t))
+    ;; ((set-face-attribute 'region nil :background "#777"))
 
-(set-face-background 'vertical-border "gray")
-(set-face-foreground 'vertical-border (face-background 'vertical-border))
+  (set-face-background 'vertical-border "gray")
+  (set-face-foreground 'vertical-border (face-background 'vertical-border))
+
+  ;; Font
+  (set-face-attribute 'default nil :family "Menlo" :height 140)
 #+END_SRC
 
 ** Navigation
