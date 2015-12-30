@@ -28,13 +28,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-  (unless (assoc-default "melpa" package-archives)
-    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-    (add-to-list 'package-archives '("elpy" . "http://jorgenschaefer.github.io/packages/"))
-    (package-refresh-contents))
-
-  (when (not package-archive-contents)
-    (package-refresh-contents))
+  (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 
   (defvar my-packages
     '(
@@ -717,6 +711,10 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
           cider-auto-select-error-buffer nil
           cider-repl-pop-to-buffer-on-connect nil
           cider-show-error-buffer nil
+          ;; nice pretty printing
+          cider-repl-use-pretty-printing t
+          ;; nicer font lock in REPL
+          cider-repl-use-clojure-font-lock t
           cider-repl-result-prefix ";; => ")
     
     (defun cider-use-repl-tools ()
