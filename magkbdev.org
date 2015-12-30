@@ -123,7 +123,8 @@ after adding these for the first time.
 #+BEGIN_SRC emacs-lisp
   (use-package highlight-current-line
     :config
-    (set-face-background 'highlight-current-line-face "#0A0A0A")
+    ;; only for dark theme
+    ;; (set-face-background 'highlight-current-line-face "#0A0A0A")
     (highlight-current-line-whole-line-on nil)
     (highlight-current-line-on t))
 #+END_SRC
@@ -381,7 +382,7 @@ Display a more compact mode line
     (progn
       (setq sml/no-confirm-load-theme t)
       
-      (sml/apply-theme 'dark)
+      (sml/apply-theme 'light)
       (setq sml/name-width 20)
       (setq sml/mode-width 'full)
       (setq sml/shorten-directory t)
@@ -513,17 +514,17 @@ allowing you to repeat those functions as needed."
 
 *** Theme
 #+BEGIN_SRC emacs-lisp
-    (use-package ample-theme
+    (use-package leuven-theme
       :ensure t
       :config
-      (load-theme 'ample-flat t))
+      (load-theme 'leuven t))
     ;; ((set-face-attribute 'region nil :background "#777"))
 
   (set-face-background 'vertical-border "gray")
   (set-face-foreground 'vertical-border (face-background 'vertical-border))
 
   ;; Font
-  (set-face-attribute 'default nil :family "Menlo" :height 140)
+  (set-face-attribute 'default nil :family "Inconsolata" :height 160)
 #+END_SRC
 
 ** Navigation
@@ -722,7 +723,6 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
       (interactive)
       (cider-interactive-eval
        "(use 'clojure.repl)"))
-
 
     (defun eval-in-nrepl ()
       (interactive)
