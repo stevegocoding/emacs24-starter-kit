@@ -20,9 +20,17 @@
 
 ** Emacs initialization
 
-(add-to-list 'exec-path "/usr/local/bin")
-(setq debug-on-error t)
-(setq debug-on-quit t)
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'exec-path "/usr/local/bin")
+  (setq debug-on-error t)
+  (setq debug-on-quit t)
+
+  ;;; Disable backup
+  (setq backup-inhibited t)
+  ;;; Disable auto save
+  (setq auto-save-default nil)
+#+END_SRC
+
 
 *** Add package sources
 
@@ -520,6 +528,7 @@ allowing you to repeat those functions as needed."
   ;; Font
   (set-face-attribute 'default nil :family "Inconsolata" :height 140)
 #+END_SRC
+
 
 ** Navigation
 *** Movement
