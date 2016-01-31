@@ -70,11 +70,13 @@
       cider
       clojure-mode
       clj-refactor
+      hl-sexp
       eval-in-repl
       paredit
       magit
       elpy
       4clojure
+      ruby-mode
       ))
 
   (dolist (p my-packages)
@@ -332,6 +334,7 @@ after adding these for the first time.
 #+BEGIN_SRC emacs-lisp
   (use-package ibuffer-vc)
 #+END_SRC 
+
 
 ** General configuration
 
@@ -872,6 +875,7 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
     (use-package eval-in-repl-cider))
 #+END_SRC
 
+
 **** Clojure Mode
 #+BEGIN_SRC emacs-lisp
   (use-package clojure-mode
@@ -910,6 +914,19 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
       (define-key clojure-mode-map (kbd "C-c C-.") 'endless/4clojure-check-and-proceed))
 
     (add-hook 'clojure-mode-hook 'my-clojure-hook-keymappings))
+#+END_SRC
+
+**** Highlight sexps
+#+BEGIN_SRC emacs-lisp
+  (use-package hl-sexp
+    :ensure t
+    :init
+    :config
+    (custom-set-faces
+     '(hl-sexp-face ((t (:background "gray95")))))
+    
+    (add-hook 'clojure-mode-hook 'hl-sexp-mode)
+    (add-hook 'emacs-lisp-mode-hook 'hl-sexp-mode))
 #+END_SRC
 
 **** clj-refactor
@@ -1009,7 +1026,12 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 (use-package 4clojure
   :ensure t)
 #+END_SRC
-     
+
+
+#+RESULTS:
+: t
+
+ 
 *** Python
 **** elpy
 #+BEGIN_SRC emacs-lisp
@@ -1022,5 +1044,11 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 
   (use-package jedi)
 #+END_SRC
-     
-     
+
+*** Ruby
+#+BEGIN_SRC emacs-lisp
+  (use-package ruby-mode
+    :config
+    (add-to-list 'auto-mode-alist '("Vagrantfile" . ruby-mode)))
+#+END_SRC
+    
