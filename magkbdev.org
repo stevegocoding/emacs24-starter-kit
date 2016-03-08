@@ -421,6 +421,7 @@ possible, although I prefer ido's way of switching buffers.
            ("M-O" . helm-ag-pop-stack)
            ("C-h a" . helm-apropos)
            ("C-x b" . helm-buffers-list)
+           ("C-x C-f" . helm-find-files)
            ("M-y" . helm-show-kill-ring)
            ("M-x" . helm-M-x)
            ("M-/" . helm-occur)
