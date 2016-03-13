@@ -32,7 +32,7 @@
 #+END_SRC
 
 
-*** Add package sources
+*** COMMENT Add package sources
 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
@@ -77,6 +77,8 @@
       elpy
       4clojure
       ruby-mode
+      emmet-mode
+      web-mode
       ))
 
   (dolist (p my-packages)
@@ -845,10 +847,19 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
           (kill-buffer buffer)))
       (cider-jack-in))
 
+    (defun cider-repl-reset ()
+      (interactive)
+      (save-some-buffers)
+      (with-current-buffer (cider-current-repl-buffer)
+        (goto-char (point-max))
+        (insert "(user/reset)")
+        (cider-repl-return)))
+
     (bind-keys :map cider-repl-mode-map
                ("M-s-r" . cider-refresh)
                ("M-s-o" . cider-use-repl-tools)
-               ("C-c m-k" . my-cider-jack-in))
+               ("C-c m-k" . my-cider-jack-in)
+               ("C-c r" . cider-repl-reset))
 
     ;; this snippet comes from schmir https://github.com/schmir/.emacs.d/blob/master/lisp/setup-clojure.el
     (defadvice cider-load-buffer (after switch-namespace activate compile)
@@ -914,7 +925,8 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
       (define-key clojure-mode-map (kbd "<C-return>") 'eir-eval-in-cider)
       (define-key clojure-mode-map (kbd "C-c C-.") 'endless/4clojure-check-and-proceed))
 
-    (add-hook 'clojure-mode-hook 'my-clojure-hook-keymappings))
+    (add-hook 'clojure-mode-hook 'my-clojure-hook-keymappings)
+    (add-hook 'clojure-mode-hook 'cider-mode))
 #+END_SRC
 
 **** Highlight sexps
@@ -935,7 +947,7 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
   (use-package clj-refactor
     :ensure t
     :init
-    ;; Add custom magic requires.
+    ;; Add Custom Magic requires.
     
     ;; (dolist (mapping '(("maps" . "outpace.util.maps")
     ;;                    ("seqs" . "outpace.util.seqs")
@@ -957,6 +969,14 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 
     (add-hook 'clojure-mode-hook #'my-clojure-mode-hook))
 #+END_SRC
+
+**** AC Cider
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
+#+RESULTS:
+: t
 
 **** Paredit
 #+BEGIN_SRC emacs-lisp
@@ -1028,9 +1048,17 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
   :ensure t)
 #+END_SRC
 
+*** web-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package web-mode
+    :ensure t
+    :init
+    (progn
+      (setq web-mode-engines-alist
+            '(("\\.html\\'"  . "django")))))
+#+END_SRC
 
 #+RESULTS:
-: t
 
  
 *** Python
@@ -1053,3 +1081,10 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
     (add-to-list 'auto-mode-alist '("Vagrantfile" . ruby-mode)))
 #+END_SRC
     
+*** emmet
+#+BEGIN_SRC emacs-lisp
+  (use-package emmet-mode
+    (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+    (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.)
+#+END_SRC
+
