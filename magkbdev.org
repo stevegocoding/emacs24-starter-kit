@@ -888,7 +888,7 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
 #+END_SRC
 
 
-**** Clojure Mode
+**** COMMENT Clojure Mode
 #+BEGIN_SRC emacs-lisp
   (use-package clojure-mode
     :ensure t
@@ -926,7 +926,11 @@ From https://github.com/purcell/emacs.d/blob/master/lisp/init-editing-utils.el
       (define-key clojure-mode-map (kbd "C-c C-.") 'endless/4clojure-check-and-proceed))
 
     (add-hook 'clojure-mode-hook 'my-clojure-hook-keymappings)
-    (add-hook 'clojure-mode-hook 'cider-mode))
+    (add-hook 'clojure-mode-hook 'cider-mode)
+
+    ;;(setq lisp-indent-offset 2)
+    (setq clojure-defun-style-default-indent t)
+    )
 #+END_SRC
 
 **** Highlight sexps
