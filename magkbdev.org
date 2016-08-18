@@ -574,11 +574,76 @@ allowing you to repeat those functions as needed."
 
 *** Org-mode
 #+BEGIN_SRC emacs-lisp
-(setq org-replace-disputed-keys t)
-(setq org-startup-truncated nil)
+    (use-package org
+      :config
+      (setq org-replace-disputed-keys t)
+      (setq org-startup-truncated nil)
+
+      ;; Org Publish to Stat Blog to Jekyll config Added 26 Mar 2015
+      ;; http://orgmode.org/worg/org-tutorials/org-jekyll.html
+      ;; Thanks to Ian Barton
+      (setq org-publish-project-alist
+            '(
+              ("org-stevegocoding"
+               ;; Path to your org files.
+               :base-directory "~/develop/projects/stevegocoding.github.io/org/"
+               :base-extension "org"
+
+               ;; Path to your Jekyll project.
+               :publishing-directory "~/develop/projects/stevegocoding.github.io/"
+               :recursive t
+               :publishing-function org-html-publish-to-html
+               :headline-levels 4 
+               :html-extension "html"
+               :body-only t ;; Only export section between <body> </body>
+               :section-numbers nil
+               :table-of-contents nil
+               :with-toc nil
+               :htmlized-source t)
+
+              ("org-static-stevegocoding"
+               :base-directory "~/develop/projects/stevegocoding.github.io/org/"
+               :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|php"
+               :publishing-directory "~/develop/projects/stevegocoding.github.io/"
+               :recursive t
+               :publishing-function org-publish-attachment)
+
+              ("stevegocoding" :components ("org-stevegocoding" "org-static-stevegocoding"))
+              ))
+
+      (defun org-toggle-link-display ()
+        "Toggle the literal or descriptive display of links."
+        (interactive)
+        (if org-descriptive-links
+            (progn (org-remove-from-invisibility-spec '(org-link))
+                   (org-restart-font-lock)
+                   (setq org-descriptive-links nil))
+          (progn (add-to-invisibility-spec '(org-link))
+                 (org-restart-font-lock)
+                 (setq org-descriptive-links t))))
+
+      (setq org-src-fontify-natively t)
+      (setq org-export-htmlize-output-type 'css)
+
+      ;; active Babel languages
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((C . t)
+         (emacs-lisp . t)
+         (js . t)
+         (clojure . t)
+         (python . t))))
+
 #+END_SRC
 
 #+RESULTS:
+
+*** htmlize
+#+BEGIN_SRC emacs-lisp
+  (use-package htmlize
+    :ensure t)
+#+END_SRC
+
     
 *** Frequently-accessed files
 
